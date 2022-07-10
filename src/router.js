@@ -46,7 +46,7 @@ const loginOpts = { schema: loginSchema }
 
 export default async function router(fastify) {
   // Common tokens middleware
-  fastify.decorateReply('sendTokens', async function (user) {
+  fastify.decorateReply('sendTokens', function (user) {
     const options = { expiresIn: process.env.ACCESS_TOKEN_TTL || '15m' }
     const payload = {
       email: user.email,
@@ -55,14 +55,15 @@ export default async function router(fastify) {
       roles: user.roles,
     }
 
-    const accessToken = await jwt.sign(payload, jwtSecret, options)
+    const accessToken = jwt.sign(payload, jwtSecret, options)
     const refreshToken = cryptoRandomString({ length: 128, type: 'url-safe' })
 
-    await saveToken(user, refreshToken)
+    saveToken(user, refreshToken)
 
     this.setCookie('refresh_token', refreshToken, {
       httpOnly: true,
       session: false,
+      path: '/',
     })
     this.send({ accessToken })
   })
