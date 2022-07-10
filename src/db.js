@@ -31,8 +31,8 @@ export async function getUserByEmail(email) {
   return User.findOne({ email })
 }
 
-export async function saveToken(user, token) {
-  const newToken = new Token({ userId: user.id, token })
+export async function saveToken({ id }, token) {
+  const newToken = new Token({ userId: id, token })
   return await newToken.save()
 }
 
