@@ -3,18 +3,10 @@ import User from './models/user.js'
 import Token from './models/token.js'
 
 export async function connectDB(uri) {
-  try {
-    await mongoose.connect(
-      uri || process.env.MONGODB_URI || 'mongodb://localhost:27017',
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      },
-    )
-  } catch (error) {
-    console.error(error.message)
-    process.exit(1)
-  }
+  await mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
 }
 
 export async function disconnectDB() {
