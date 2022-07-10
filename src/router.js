@@ -24,6 +24,10 @@ const loginSchema = {
         type: 'string',
         pattern: '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}',
       },
+      username: {
+        type: 'string',
+        pattern: '^[a-zA-Z0-9]{3,}$',
+      },
     },
     required: ['email', 'password'],
   },
@@ -65,7 +69,7 @@ export default async function router(fastify) {
 
   // Registration
   fastify.post('/user/new', registerOpts, async function (request, reply) {
-    const { email, password } = request.body
+    const { email, password, username } = request.body
     const user = await getUserByEmail(email)
 
     if (user) {
@@ -73,8 +77,18 @@ export default async function router(fastify) {
         error: 'User already exists',
       })
     }
+
+    let genUsername = username
+    if (!username) {
+      genUsername =
+        email.split('@')[0] + '-' + cryptoRandomString({ length: 4 })
+    }
     const passwordHash = await argon2.hash(password)
-    const newUser = await saveUser({ email, passwordHash })
+    const newUser = await saveUser({
+      email,
+      passwordHash,
+      username: genUsername,
+    })
 
     reply.code(201).sendTokens(newUser)
   })
