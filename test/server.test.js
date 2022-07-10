@@ -170,6 +170,7 @@ describe('/refresh endpoint', () => {
 // describe('/reset endpoint', () => {})
 
 // TODO: Make tests independent
+// TODO: Check expiration of tokens
 
 describe('/logout endpoint', () => {
   test('User gets 200 on successful logout', async () => {

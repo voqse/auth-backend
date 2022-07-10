@@ -1,7 +1,7 @@
 import argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
 import cryptoRandomString from 'crypto-random-string'
-import { addToken, addUser, getToken, getUser, removeToken } from './db.js'
+import { getToken, getUser, deleteToken, saveToken, saveUser } from './db.js'
 
 const jwtSecret = process.env.JWT_SECRET || 'you-must-define-a-secret'
 
@@ -34,11 +34,16 @@ const registerOpts = { schema: loginSchema }
 const loginOpts = { schema: loginSchema }
 
 export default async function router(fastify) {
-  fastify.decorateReply('issueTokens', async function ({ email }) {
-    const accessToken = await jwt.sign({ email }, jwtSecret)
+  // Common tokens middleware
+  fastify.decorateReply('sendTokens', async function ({ email }) {
+    const options = { expiresIn: process.env.ACCESS_TOKEN_TTL || '1h' }
+    const payload = { email }
+
+    const accessToken = await jwt.sign(payload, jwtSecret, options)
     const refreshToken = cryptoRandomString({ length: 128, type: 'url-safe' })
 
-    await addToken(email, refreshToken)
+    await saveToken(email, refreshToken)
+
     this.setCookie('refresh_token', refreshToken, {
       httpOnly: true,
       session: false,
@@ -56,12 +61,12 @@ export default async function router(fastify) {
         error: 'User already exists',
       })
     }
-
     const passwordHash = await argon2.hash(password)
     const newUser = { email, password: passwordHash }
 
-    await addUser(newUser)
-    reply.code(201).issueTokens(newUser)
+    await saveUser(newUser)
+
+    reply.code(201).sendTokens(newUser)
   })
 
   // Authentication
@@ -74,14 +79,14 @@ export default async function router(fastify) {
         error: 'User does not exist',
       })
     }
-
     const isValid = await argon2.verify(user.password, password)
+
     if (!isValid) {
       reply.code(400).send({
         error: 'Password does not match',
       })
     }
-    reply.code(200).issueTokens(user)
+    reply.code(200).sendTokens(user)
   })
 
   // Refresh
@@ -94,8 +99,9 @@ export default async function router(fastify) {
         error: 'Invalid refresh token',
       })
     }
-    await removeToken(oldRefreshToken.token)
-    reply.code(200).issueTokens({ email: oldRefreshToken.email })
+    await deleteToken(oldRefreshToken.token)
+
+    reply.code(200).sendTokens({ email: oldRefreshToken.email })
   })
 
   // Logout
@@ -108,7 +114,7 @@ export default async function router(fastify) {
         error: 'Invalid refresh token',
       })
     }
-    await removeToken(oldRefreshToken.token)
+    await deleteToken(oldRefreshToken.token)
 
     reply.clearCookie('refresh_token')
     reply.code(200).send()

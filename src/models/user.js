@@ -11,15 +11,16 @@ const userSchema = new Schema({
     required: false,
     unique: true,
   },
-  password: {
+  passwordHash: {
     type: String,
     required: true,
   },
-  firstname: {
+  name: {
     type: String,
   },
-  lastname: {
-    type: String,
+  roles: {
+    type: Array,
+    default: () => ['User'],
   },
   createdAt: {
     type: Date,
@@ -28,6 +29,15 @@ const userSchema = new Schema({
   updatedAt: {
     type: Date,
     default: () => Date.now(),
+  },
+})
+
+userSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    delete ret._id
+    delete ret.passwordHash
   },
 })
 
