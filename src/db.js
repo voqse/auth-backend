@@ -1,22 +1,53 @@
-let users = []
-let tokens = []
+import mongoose from 'mongoose'
+import User from './models/user.js'
+import Token from './models/token.js'
+
+export async function connectDB(uri) {
+  try {
+    await mongoose.connect(
+      uri || process.env.MONGODB_URI || 'mongodb://localhost:27017',
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      },
+    )
+  } catch (error) {
+    console.error(error.message)
+    process.exit(1)
+  }
+}
+
+export async function disconnectDB() {
+  return await mongoose.connection.close()
+}
+
+export async function clearDB() {
+  await User.deleteMany({})
+  await Token.deleteMany({})
+}
 
 export async function saveUser(user) {
-  users.push(user)
+  const newUser = new User(user)
+  return await newUser.save()
 }
 
-export async function getUser(email) {
-  return users.find((user) => user.email === email)
+export async function getUserById(id) {
+  return User.findById(id)
 }
 
-export async function saveToken(email, token) {
-  tokens.push({ email, token })
+export async function getUserByEmail(email) {
+  return User.findOne({ email })
+}
+
+export async function saveToken(user, token) {
+  const newToken = new Token({ userId: user.id, token })
+  return await newToken.save()
 }
 
 export async function getToken(token) {
-  return tokens.find((t) => t.token === token)
+  return Token.findOne({ token })
 }
 
 export async function deleteToken(token) {
-  tokens = tokens.filter((t) => t.token !== token)
+  await Token.deleteOne({ token })
 }

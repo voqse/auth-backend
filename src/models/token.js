@@ -1,5 +1,6 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose from 'mongoose'
 
+const { Schema } = mongoose
 const tokenSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
@@ -12,7 +13,7 @@ const tokenSchema = new Schema({
   },
   expiresAt: {
     type: Date,
-    default: () => Date.now() + (process.env.REFRESH_TOKEN_TTL || '14d') * 1000,
+    default: () => new Date(Date.now() + 15 * 60 * 1000),
   },
   createdAt: {
     type: Date,
@@ -20,7 +21,6 @@ const tokenSchema = new Schema({
   },
   createdByIp: {
     type: String,
-    required: true,
   },
 })
 

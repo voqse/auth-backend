@@ -21,6 +21,7 @@
     "cross-env": "^7.0.3",
     "crypto-random-string": "^5.0.0",
     "dotenv": "^16.0.1",
+    "duration": "^0.2.2",
     "fastify": "^4.1.0",
     "fastify-plugin": "^3.0.1",
     "http-errors": "^2.0.0",

@@ -1,14 +1,18 @@
 import buildServer from '../src/server.js'
 import jwt from 'jsonwebtoken'
+import { clearDB, connectDB, disconnectDB } from '../src/db.js'
 
 const server = buildServer()
 
 beforeAll(async () => {
   await server.ready()
+  await connectDB('mongodb://localhost:27017/test-auth-db')
 })
 
 afterAll(async () => {
   await server.close()
+  await clearDB()
+  await disconnectDB()
 })
 
 const users = {
@@ -145,7 +149,7 @@ describe('/refresh endpoint', () => {
       },
     })
     const { accessToken } = JSON.parse(body)
-    const { email } = jwt.decode(accessToken, null)
+    const { email } = jwt.decode(accessToken, null) //?
 
     testCookies = cookies[0]
 
