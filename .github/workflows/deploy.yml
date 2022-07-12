@@ -30,6 +30,7 @@ jobs:
           port: ${{ secrets.PORT }}
           key: ${{ secrets.SSHKEY }}
           script: |
+            cp -R -f env/auth-backend/. node/auth-backend/
             cd node/auth-backend
             npm ci
             pm2 delete src/index.js
