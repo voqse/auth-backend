@@ -81,6 +81,8 @@ export default async function router(fastify) {
       })
     }
 
+    // TODO: Check if username is taken
+    // TODO: Better username validation
     let genUsername = username
     if (!username) {
       genUsername =
