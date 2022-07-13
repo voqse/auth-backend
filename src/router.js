@@ -50,6 +50,7 @@ export default async function router(fastify) {
     const options = {
       expiresIn: process.env.ACCESS_TOKEN_TTL || '15m',
       issuer: 'https://auth.voqse.com',
+      subject: user.id,
     }
     const payload = {
       email: user.email,

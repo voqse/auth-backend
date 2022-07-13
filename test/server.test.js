@@ -42,7 +42,7 @@ let testCookies
 
 describe('/register endpoint', () => {
   test('User gets 201 on successful registration', async () => {
-    const { statusCode, cookies, body, headers } = await server.inject({
+    const { statusCode, cookies, body } = await server.inject({
       method: 'POST',
       url: '/user/new',
       payload: users.valid,
