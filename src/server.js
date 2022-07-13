@@ -13,10 +13,10 @@ export default function buildServer(options = {}) {
   server.register(cors, {
     origin: /voqse\.com$/,
   })
-  server.register(rateLimit, {
-    max: 2,
-    timeWindow: 1000,
-  })
+  // server.register(rateLimit, {
+  //   max: 2,
+  //   timeWindow: 1000,
+  // })
   server.register(cookie, {
     secret: process.env.COOKIES_SECRET || 'you-must-define-a-secret', // for cookies signature
     // parseOptions: {}, // options for parsing cookies
