@@ -42,7 +42,7 @@ let testCookies
 
 describe('/register endpoint', () => {
   test('User gets 201 on successful registration', async () => {
-    const { statusCode, cookies, body } = await server.inject({
+    const { statusCode, cookies, body, headers } = await server.inject({
       method: 'POST',
       url: '/user/new',
       payload: users.valid,
@@ -175,6 +175,7 @@ describe('/refresh endpoint', () => {
 
 // TODO: Make tests independent
 // TODO: Check expiration of tokens
+// TODO: Make error more descriptive
 
 describe('/logout endpoint', () => {
   test('User gets 200 on successful logout', async () => {

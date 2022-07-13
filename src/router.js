@@ -47,7 +47,10 @@ const loginOpts = { schema: loginSchema }
 export default async function router(fastify) {
   // Common tokens middleware
   fastify.decorateReply('sendTokens', function (user) {
-    const options = { expiresIn: process.env.ACCESS_TOKEN_TTL || '15m' }
+    const options = {
+      expiresIn: process.env.ACCESS_TOKEN_TTL || '15m',
+      issuer: 'https://auth.voqse.com',
+    }
     const payload = {
       email: user.email,
       username: user.username,
