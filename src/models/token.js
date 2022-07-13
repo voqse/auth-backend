@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import ms from 'ms'
 
 const { Schema } = mongoose
 const tokenSchema = new Schema({
@@ -13,7 +14,8 @@ const tokenSchema = new Schema({
   },
   expiresAt: {
     type: Date,
-    default: () => new Date(Date.now() + 15 * 60 * 1000),
+    default: () =>
+      new Date(Date.now() + ms(process.env.REFESH_TOKEN_TTL || '15d')),
   },
   createdAt: {
     type: Date,

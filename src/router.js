@@ -52,11 +52,10 @@ export default async function router(fastify) {
       email: user.email,
       username: user.username,
       name: user.name,
-      roles: user.roles,
     }
 
     const accessToken = jwt.sign(payload, jwtSecret, options)
-    const refreshToken = cryptoRandomString({ length: 128, type: 'url-safe' })
+    const refreshToken = cryptoRandomString({ length: 64, type: 'url-safe' })
 
     saveToken(user, refreshToken)
 

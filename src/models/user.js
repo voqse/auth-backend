@@ -19,10 +19,6 @@ const userSchema = new Schema({
   name: {
     type: String,
   },
-  roles: {
-    type: Array,
-    default: () => ['User'],
-  },
   createdAt: {
     type: Date,
     default: () => Date.now(),
