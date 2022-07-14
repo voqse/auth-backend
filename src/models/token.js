@@ -34,6 +34,11 @@ tokenSchema.virtual('isActive').get(function () {
   return !this.isExpired
 })
 
+tokenSchema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: ms(process.env.REFESH_TOKEN_TTL || '15d') / 1000 },
+)
+
 tokenSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,
