@@ -149,7 +149,7 @@ describe('/refresh endpoint', () => {
       },
     })
     const { accessToken } = JSON.parse(body)
-    const { email } = jwt.decode(accessToken, null) //?
+    const { email } = jwt.decode(accessToken, null)
 
     testCookies = cookies[0]
 

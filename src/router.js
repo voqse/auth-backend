@@ -1,16 +1,12 @@
 import argon2 from 'argon2'
-import jwt from 'jsonwebtoken'
 import cryptoRandomString from 'crypto-random-string'
 import {
   getToken,
   deleteToken,
-  saveToken,
   saveUser,
   getUserById,
   getUserByEmail,
 } from './db.js'
-
-const jwtSecret = process.env.JWT_SECRET || 'you-must-define-a-secret'
 
 const loginSchema = {
   body: {
@@ -45,32 +41,6 @@ const registerOpts = { schema: loginSchema }
 const loginOpts = { schema: loginSchema }
 
 export default async function router(fastify) {
-  // Common tokens middleware
-  fastify.decorateReply('sendTokens', function (user) {
-    const options = {
-      expiresIn: process.env.ACCESS_TOKEN_TTL || '15m',
-      issuer: 'https://auth.voqse.com',
-      subject: user.id,
-    }
-    const payload = {
-      email: user.email,
-      username: user.username,
-      name: user.name,
-    }
-
-    const accessToken = jwt.sign(payload, jwtSecret, options)
-    const refreshToken = cryptoRandomString({ length: 64, type: 'url-safe' })
-
-    saveToken(user, refreshToken)
-
-    this.setCookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      session: false,
-      path: '/',
-    })
-    this.send({ accessToken })
-  })
-
   // Registration
   fastify.post('/user/new', registerOpts, async function (request, reply) {
     const { email, password, username } = request.body

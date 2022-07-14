@@ -4,6 +4,7 @@ import cors from '@fastify/cors'
 import cookie from '@fastify/cookie'
 import router from './router.js'
 import rateLimit from '@fastify/rate-limit'
+import utils from './plugins/utils.js'
 
 export default function buildServer(options = {}) {
   const server = fastify(options)
@@ -21,6 +22,7 @@ export default function buildServer(options = {}) {
     secret: process.env.COOKIES_SECRET || 'you-must-define-a-secret', // for cookies signature
     // parseOptions: {}, // options for parsing cookies
   })
+  server.register(utils)
   server.register(router)
 
   return server
