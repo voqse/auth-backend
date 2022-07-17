@@ -7,6 +7,7 @@ import {
   getUserById,
   getUserByEmail,
 } from './db.js'
+import createError from 'http-errors'
 
 const loginSchema = {
   body: {
@@ -42,14 +43,12 @@ const loginOpts = { schema: loginSchema }
 
 export default async function router(fastify) {
   // Registration
-  fastify.post('/user/new', registerOpts, async function (request, reply) {
+  fastify.post('/users/new', registerOpts, async function (request, reply) {
     const { email, password, username } = request.body
     const user = await getUserByEmail(email)
 
     if (user) {
-      reply.code(400).send({
-        error: 'User already exists',
-      })
+      reply.send(new createError.Conflict('User already exists'))
     }
 
     // TODO: Check if username is taken
@@ -73,18 +72,10 @@ export default async function router(fastify) {
   fastify.post('/session/new', loginOpts, async function (request, reply) {
     const { email, password } = request.body
     const user = await getUserByEmail(email)
+    const isValid = user && (await argon2.verify(user.passwordHash, password))
 
-    if (!user) {
-      reply.code(400).send({
-        error: 'User does not exist',
-      })
-    }
-    const isValid = await argon2.verify(user.passwordHash, password)
-
-    if (!isValid) {
-      reply.code(400).send({
-        error: 'Password does not match',
-      })
+    if (!user || !isValid) {
+      reply.send(new createError.Unauthorized('Invalid email or password'))
     }
     reply.code(200).sendTokens(user)
   })
@@ -96,9 +87,7 @@ export default async function router(fastify) {
     const user = refreshToken && (await getUserById(refreshToken.userId))
 
     if (!refreshToken || !user) {
-      reply.code(400).send({
-        error: 'Invalid refresh token',
-      })
+      reply.send(new createError.Unauthorized('Invalid refresh token'))
     }
     await deleteToken(refreshToken.token)
 
@@ -111,9 +100,7 @@ export default async function router(fastify) {
     const refreshToken = await getToken(refresh_token)
 
     if (!refreshToken) {
-      reply.code(400).send({
-        error: 'Invalid refresh token',
-      })
+      reply.send(new createError.Unauthorized('Invalid refresh token'))
     }
     await deleteToken(refreshToken.token)
 
