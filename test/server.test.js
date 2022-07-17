@@ -1,12 +1,44 @@
-import buildServer from '../src/server.js'
 import jwt from 'jsonwebtoken'
+import buildServer from '../src/server.js'
 import { clearDB, connectDB, disconnectDB } from '../src/db.js'
 
-let server
+function register(user) {
+  return server.inject({
+    method: 'POST',
+    url: '/users/new',
+    payload: user,
+  })
+}
 
-beforeEach(async () => {
-  server = buildServer()
-})
+function login(user) {
+  return server.inject({
+    method: 'POST',
+    url: '/session/new',
+    payload: user,
+  })
+}
+
+function refresh(refreshToken) {
+  return server.inject({
+    method: 'POST',
+    url: '/session',
+    cookies: {
+      refresh_token: refreshToken,
+    },
+  })
+}
+
+function logout(refreshToken) {
+  return server.inject({
+    method: 'DELETE',
+    url: '/session',
+    cookies: {
+      refresh_token: refreshToken,
+    },
+  })
+}
+
+let server = buildServer()
 
 beforeEach(async () => {
   await server.ready()
@@ -45,47 +77,11 @@ const users = {
   },
 }
 
-function register(user) {
-  return server.inject({
-    method: 'POST',
-    url: '/users/new',
-    payload: user,
-  })
-}
-
-function login(user) {
-  return server.inject({
-    method: 'POST',
-    url: '/session/new',
-    payload: user,
-  })
-}
-
-function refresh(refreshToken) {
-  return server.inject({
-    method: 'POST',
-    url: '/session',
-    cookies: {
-      refresh_token: refreshToken,
-    },
-  })
-}
-
-function logout(refreshToken) {
-  return server.inject({
-    method: 'DELETE',
-    url: '/session',
-    cookies: {
-      refresh_token: refreshToken,
-    },
-  })
-}
-
 describe('Registration', () => {
   test('User gets 201 on successful registration', async () => {
     const { statusCode, cookies, body } = await register(users.valid)
     const { accessToken } = JSON.parse(body)
-    const { email } = jwt.decode(accessToken, null)
+    const { email } = jwt.decode(accessToken)
 
     expect(statusCode).toBe(201)
     expect(email).toBe(users.valid.email)
@@ -117,7 +113,7 @@ describe('Login', () => {
 
     const { statusCode, cookies, body } = await login(users.valid)
     const { accessToken } = JSON.parse(body)
-    const { email } = jwt.decode(accessToken, null)
+    const { email } = jwt.decode(accessToken)
 
     expect(statusCode).toBe(200)
     expect(email).toBe(users.valid.email)
@@ -153,7 +149,7 @@ describe('Refresh', () => {
 
     const { statusCode, cookies, body } = await refresh(oldCookies[0].value)
     const { accessToken } = JSON.parse(body)
-    const { email } = jwt.decode(accessToken, null)
+    const { email } = jwt.decode(accessToken)
 
     expect(statusCode).toBe(200)
     expect(email).toBe(users.valid.email)
@@ -190,3 +186,4 @@ describe('Logout', () => {
 // describe('/reset endpoint', () => {})
 
 // TODO: Check expiration of tokens
+// TODO: Make fake DB for CI tests
