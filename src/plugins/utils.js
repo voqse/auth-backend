@@ -9,7 +9,7 @@ async function utils(fastify) {
     const secret = process.env.JWT_SECRET || 'you-must-define-a-secret'
     const options = {
       expiresIn: process.env.ACCESS_TOKEN_TTL || '15m',
-      issuer: process.env.ACCESS_TOKEN_TTL || 'https://auth.example.com',
+      issuer: process.env.JWT_ISS || 'https://auth.example.com',
       subject: user.id,
     }
     const payload = {
