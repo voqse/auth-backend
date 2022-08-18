@@ -28,7 +28,7 @@ async function utils(fastify) {
       session: false,
       path: '/',
     })
-    this.send({ accessToken })
+    return this.send({ accessToken })
   })
 }
 

@@ -65,7 +65,7 @@ export default async function router(fastify) {
       username: genUsername,
     })
 
-    reply.code(201).sendTokens(newUser)
+    return reply.code(201).sendTokens(newUser)
   })
 
   // Authentication
@@ -77,7 +77,7 @@ export default async function router(fastify) {
     if (!user || !isValid) {
       throw new createError.Unauthorized('Invalid email or password')
     }
-    reply.code(200).sendTokens(user)
+    return reply.code(200).sendTokens(user)
   })
 
   // Refresh
@@ -91,7 +91,7 @@ export default async function router(fastify) {
     }
     await deleteToken(refreshToken.token)
 
-    reply.code(200).sendTokens(user)
+    return reply.code(200).sendTokens(user)
   })
 
   // Logout
@@ -105,6 +105,6 @@ export default async function router(fastify) {
     await deleteToken(refreshToken.token)
 
     reply.clearCookie('refresh_token')
-    reply.code(200).send()
+    return reply.code(200).send()
   })
 }
