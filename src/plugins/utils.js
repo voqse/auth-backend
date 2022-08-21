@@ -6,7 +6,12 @@ import { saveToken } from '../db.js'
 async function utils(fastify) {
   // Common tokens middleware
   fastify.decorateReply('sendTokens', function (user) {
-    const secret = process.env.JWT_SECRET || 'you-must-define-a-secret'
+    const secret = process.env.JWT_SECRET
+
+    if (!secret) {
+      return new Error('You must define a secret')
+    }
+
     const options = {
       expiresIn: process.env.ACCESS_TOKEN_TTL || '15m',
       issuer: process.env.JWT_ISS || 'https://auth.example.com',
