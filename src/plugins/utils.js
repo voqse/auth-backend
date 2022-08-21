@@ -3,15 +3,15 @@ import jwt from 'jsonwebtoken'
 import cryptoRandomString from 'crypto-random-string'
 import { saveToken } from '../db.js'
 
-async function utils(fastify) {
+async function utils(fastify, options = {}) {
+  const { secret } = options
+
+  if (!secret) {
+    return new Error('You must define a secret')
+  }
+
   // Common tokens middleware
   fastify.decorateReply('sendTokens', function (user) {
-    const secret = process.env.JWT_SECRET
-
-    if (!secret) {
-      return new Error('You must define a secret')
-    }
-
     const options = {
       expiresIn: process.env.ACCESS_TOKEN_TTL || '15m',
       issuer: process.env.JWT_ISS || 'https://auth.example.com',

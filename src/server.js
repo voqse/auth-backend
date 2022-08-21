@@ -22,7 +22,9 @@ export default function buildServer(options = {}) {
     secret: process.env.COOKIES_SECRET || 'you-must-define-a-secret', // for cookies signature
     // parseOptions: {}, // options for parsing cookies
   })
-  server.register(utils)
+  server.register(utils, {
+    secret: process.env.JWT_SECRET || 'you-must-define-a-secret',
+  })
   server.register(router)
 
   return server
