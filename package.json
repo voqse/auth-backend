@@ -1,7 +1,7 @@
 {
   "name": "auth-backend",
   "version": "1.0.0",
-  "description": "Auth backend server for personal projects",
+  "description": "Fastify auth server for personal projects",
   "main": "./src/index.js",
   "type": "module",
   "scripts": {
