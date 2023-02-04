@@ -48,7 +48,7 @@ export default async function router(fastify) {
     const user = await getUserByEmail(email)
 
     if (user) {
-      throw new createError.Conflict('User already exists')
+      throw createError.Conflict('User already exists')
     }
 
     // TODO: Check if username is taken
@@ -75,7 +75,7 @@ export default async function router(fastify) {
     const isValid = user && (await argon2.verify(user.passwordHash, password))
 
     if (!user || !isValid) {
-      throw new createError.Unauthorized('Invalid email or password')
+      throw createError.Unauthorized('Invalid email or password')
     }
     return reply.code(200).sendTokens(user)
   })
@@ -87,7 +87,7 @@ export default async function router(fastify) {
     const user = refreshToken && (await getUserById(refreshToken.userId))
 
     if (!refreshToken || !user) {
-      throw new createError.Unauthorized('Invalid refresh token')
+      throw createError.Unauthorized('Invalid refresh token')
     }
     await deleteToken(refreshToken.token)
 
@@ -100,7 +100,7 @@ export default async function router(fastify) {
     const refreshToken = await getToken(refresh_token)
 
     if (!refreshToken) {
-      throw new createError.Unauthorized('Invalid refresh token')
+      throw createError.Unauthorized('Invalid refresh token')
     }
     await deleteToken(refreshToken.token)
 
