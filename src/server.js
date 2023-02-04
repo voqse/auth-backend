@@ -11,9 +11,9 @@ export default function buildServer(options = {}) {
 
   // Register middlewares
   // server.register(helmet)
-  server.register(cors, {
-    origin: /voqse\.com$/,
-  })
+  // server.register(cors, {
+  //   origin: /voqse\.com$/,
+  // })
   // server.register(rateLimit, {
   //   max: 2,
   //   timeWindow: 1000,
